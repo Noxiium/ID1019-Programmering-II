@@ -21,12 +21,14 @@ defmodule Derivative do
 
   # Function #
   def run() do
-    t=  {:cos,
-          {:add,
-            {:exponent, {:variable, :x}, {:number, 2}},
-            {:multi, {:number, 5}, {:variable, :x}}
-          }
+    t=  {:multi,
+          {:multi,
+            {:multi, {:number, 4}, {:variable, :x}},
+            {:multi, {:number, 2}, {:variable, :x}}
+          },
+          {:number, 2}
         }
+
     result = deriv(t, :x)
 
     expression_simplified = syntax_fix(t)
@@ -70,22 +72,21 @@ defmodule Derivative do
     {:multi, {:multi, {:number, -1}, deriv(expr, v)}, {:sin, expr}}
   end
 
-  def deriv({:division, nExpr, dExpr}) do
-    deriv({:multi, expr1, {:division, {:number, 1}, dExpr}})
+  def deriv({:exponent, expr, {:number, n}}, v) do
+    {:multi,
+      {:multi, {:number, n}, {:exponent, expr, {:number, n-1}}},
+      deriv(expr, v)
+    }
   end
 
-  def deriv({:division,})
 
-  def deriv({:division, nExpr, {:variable, v}}), do: deriv({:division, nExpr, {:exponent, {:variable, v}, {:number, 1}}})
-
-  end
   # Changes the expressions to strings.
   def print({:number, n}),              do: "#{n}"
   def print({:variable, v}),            do: "#{v}"
   def print({:add, expr1, expr2}),      do: "#{print(expr1)}+#{print(expr2)}"
   def print({:multi, {:number, n}, {:variable, v}}), do: "#{n}#{v}"
   def print({:multi, expr1, expr2}),    do: "#{print(expr1)}*#{print(expr2)}"
-  def print({:exponent, expr1, expr2}), do: "(#{print(expr1)}^#{print(expr2)})"
+  def print({:exponent, expr1, expr2}), do: "(#{print(expr1)})^(#{print(expr2)})"
   def print({:ln, expr}),               do: "ln(#{print(expr)})"
   def print({:division, nExpr, dExpr}), do: "(#{print(nExpr)}) / (#{print(dExpr)})"
   def print({:sin, expr}),              do: "sin(#{print(expr)})"
@@ -129,8 +130,10 @@ defmodule Derivative do
   def syntax_fix_multi({:number, n1}, {:number, n2}),  do: {:number, n1*n2}
   def syntax_fix_multi({:number, 0}, _),               do: {:number, 0}
   def syntax_fix_multi(_, {:number, 0}),               do: {:number, 0}
+  def syntax_fix_multi({:multi, {:number, n1}, expr}, {:number, n2}), do: {:multi, {:number, n1*n2}, expr}
   def syntax_fix_multi({:number, n1}, {:multi, {:number, n2}, expr}), do: {:multi, {:number, n1*n2}, expr}
   def syntax_fix_multi({:number, n0}, {:add, {:multi, {:number, n1}, {:variable, v}}, {:number, n2}}), do: {:add, {:multi, {:number, n0*n1}, {:variable, v}}, {:number, n0*n2}}
+
 
   def syntax_fix_multi(expr1, expr2),                  do: {:multi, expr1, expr2}
 
