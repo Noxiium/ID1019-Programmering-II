@@ -4,7 +4,7 @@ defmodule EnvList do
   ## a tuple consist of an key of the type atom (:a, :b, :c etc.)
   ## and a value of the type integer.
 
-  def new_map() do [] end
+  def new() do [] end
 
   def add([], key, value) do [{key,value}] end
   def add([{key, _}|t], key, value) do [{key,value}|t] end

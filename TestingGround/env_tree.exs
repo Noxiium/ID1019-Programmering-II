@@ -13,17 +13,14 @@ defmodule EnvTree do
   ## branch (or the rightmost in the left branch).
   ##
   ##              4
-  ##          2       7
-  ##       1    3   6    20
+  ##          1       20
+  ##      nil    2   6    10
   ##
 
-  def create_tree() do :nil end
+  def new() do :nil end
 
   def add(:nil, key, value) do {:node, key, value, :nil, :nil} end
-  def add({:node, key, _, left, right}, key, value) do
-    {:node, key, value, left, right}
-  end
-
+  def add({:node, key, _, left, right}, key, value) do {:node, key, value, left, right} end
   def add({:node, k, v, left, right}, key, value) do
     if key < k do #left
       {:node, k, v, add(left, key, value), right}
@@ -44,10 +41,31 @@ defmodule EnvTree do
 
   def remove(:nil, _) do :nil end
   def remove({:node, key, _, :nil, :nil}, key) do :nil end
-  def remove({:node, key, value, left, right}, key) do
-
+  def remove({:node, key, _, left, :nil}, key) do left end
+  def remove({:node, key, _, :nil, right}, key) do right end
+  def remove({:node, key, _, left, right}, key) do
+    {key, value, right} = find_leftmost(right)
+    {:node, key, value, left, right}
+  end
+  def remove({:node, k, v, left, right}, key) do
+    if key < k do #left
+      {:node, k, v, remove(left, key), right}
+    else
+      {:node, k, v, left, remove(right, key),}
+    end
   end
 
+  def find_leftmost({:node, key, value, :nil, right}) do {key, value, right} end
+  def find_leftmost({:node, k, v, left, right}) do
+    {key, value, left} = find_leftmost(left)
+    {key, value, {:node, k, v, left, right}}
+  end
 
-
+  def print {:node, k, _, :nil, :nil} do "#{k} end" end
+  def print {:node, k, _, left, :nil} do "#{k} left[#{print(left)}]"
+  end
+  def print {:node, k, _, :nil, right} do "#{k} right[#{print(right)}]"
+  end
+  def print {:node, k, _, left, right} do "#{k} left[#{print(left)}]right[#{print(right)}]"
+  end
 end
