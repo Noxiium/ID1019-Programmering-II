@@ -10,7 +10,7 @@ defmodule BenchMark do
     :io.format("~18.s~12.s~12.s~12.s~12.s~12.s~12.s~12.s~12.s\n", ["list", "tree", "map", "list", "tree", "map", "list", "tree", "map"])
     Enum.each(ls, fn (i) ->
       {i, tla, tta, tma, tll, ttl, tml, tlr, ttr, tmr} = bench(i, n)
-      :io.format("~6.w~12.2f~12.2f~12.2f~12.2f~12.2f~12.2f~12.2f~12.2f~12.2f\n", [i,tla/n, tta/n, tma/n, tll/n, ttl/n, tml/n, tlr/n, ttr/n, tmr/n])
+      :io.format("~6.w&~12.2f&~12.2f&~12.2f&~12.2f&~12.2f&~12.2f&~12.2f&~12.2f&~12.2f\\\\\n", [i,tla/n, tta/n, tma/n, tll/n, ttl/n, tml/n, tlr/n, ttr/n, tmr/n])
     end)
 
     :ok
