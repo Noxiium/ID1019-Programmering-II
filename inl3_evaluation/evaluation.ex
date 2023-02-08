@@ -23,7 +23,9 @@ defmodule Evaluation do
       #exp = createExprTwo()
       #exp = createExprThree()
       #exp = createExprFour()
-      exp = {:sub, {:num, 10}, {:div, {:num, 9}, {:num, 4}}}
+      #exp = createExprFive()
+      ##exp = {:sub, {:num, 10}, {:div, {:num, 9}, {:num, 4}}}
+      exp = {:multi, {:ratio, {:num, 3}, {:var, :b}}, {:ratio, {:num, 2}, {:num, 3}}}#, {:multi, {:ratio, {:num, 3}, {:num, 2}}, {:ratio, {:num, 3}, {:num, 2}}}}
       #3 10 - 3/9 == 10 - 1/3
       env = createEnv()
       afterEval = evaluate(exp, env)
@@ -36,7 +38,7 @@ defmodule Evaluation do
       IO.write "\nSimplified:\n"
       IO.inspect(simplified)
       IO.write "\nPrinted:\n"
-      IO.write"#{print(simplified)}\n"
+      #IO.write"#{print(simplified)}\n"
 
 
 
@@ -66,7 +68,7 @@ defmodule Evaluation do
 
     def createExprFive() do
       ## 2/4 + 3*b (b=2) => 1/2 + 6
-      {:add, {:div, {:num, 2}, {:num, 4}}, {:multi, {:num, 3}, {:var, :b}}}
+      {:div, {:add, {:num, 2}, {:num, 4}}, {:multi, {:num, 3}, {:var, :b}}}
     end
 
     def createEnv() do
@@ -90,6 +92,7 @@ defmodule Evaluation do
     def evaluate({:add, {:num, n1}, {:num, n2}}, enviroment), do: {:num, n1+n2}
     def evaluate({:multi, {:num, n1}, {:num, n2}}, enviroment), do: {:num, n1*n2}
     def evaluate({:sub, {:num, n1}, {:num, n2}}, enviroment), do: {:num, n1-n2}
+
     def evaluate({:multi, expr1, expr2}, enviroment) do
       {:multi, evaluate(expr1, enviroment),evaluate(expr2, enviroment)}
     end
@@ -103,6 +106,10 @@ defmodule Evaluation do
     end
 
     def evaluate({:div, expr1, expr2}, enviroment) do
+      {:div, evaluate(expr1, enviroment), evaluate(expr2, enviroment)}
+    end
+
+    def evaluates({:div, expr1, expr2}, enviroment) do
       {:num, n1} = evaluate(expr1, enviroment)
       {:num, n2} = evaluate(expr2, enviroment)
       getRatioDataStructure(n1, n2)
@@ -138,8 +145,6 @@ defmodule Evaluation do
     def simplifyDataStructure({:add, {:num, n1}, {:num, n2}}), do: {:num, n1+n2}
     def simplifyDataStructure({:multi, {:num, n1}, {:num, n2}}), do: {:num, n1*n2}
     def simplifyDataStructure({:sub, {:num, n1}, {:num, n2}}), do: {:num, n1-n2}
-    def simplifyDataStructure({:div, expr1, expr2}), do: {:ratio, expr1, expr2}
-    def simplifyDataStructure({:ratio, expr1, expr2}), do: {:ratio, expr1, expr2}
 
     def simplifyDataStructure({:add, expr1, expr2}) do
       simplifyDataStructure_add(simplifyDataStructure(expr1), simplifyDataStructure(expr2))
@@ -150,6 +155,15 @@ defmodule Evaluation do
     def simplifyDataStructure({:sub, expr1, expr2}) do
       simplifyDataStructure_sub(simplifyDataStructure(expr1), simplifyDataStructure(expr2))
     end
+
+    def simplifyDataStructure({:div, expr1, expr2}) do
+      simplifyDataStructure_div(simplifyDataStructure(expr1), simplifyDataStructure(expr2))
+    end
+
+    def simplifyDataStructure({:ratio, expr1, expr2}) do
+      simplifyDataStructure_div(simplifyDataStructure(expr1), simplifyDataStructure(expr2))
+    end
+
 
     def simplifyDataStructure_add({:num, n1}, {:num, n2}), do: {:num, n1+n2}
     def simplifyDataStructure_add({:num, n1}, {:ratio, {:num, n2}, {:num, n3}}) do
@@ -179,6 +193,10 @@ defmodule Evaluation do
       simplifyDataStructure({:add, {:num, n1*n2}, getRatioDataStructure(n1*n3,n4)})
     end
 
+    def simplifyDataStructure_multi({:add, {:num, n2}, {:ratio, {:num, n3}, {:num, n4}},{:ratio, {:num, n5}, {:num, n6}}})do
+      simplifyDataStructure({:add, {:num, n1*n2}, getRatioDataStructure(n1*n3,n4)})
+    end
+
     def simplifyDataStructure_sub({:num, n1}, {:num, n2}), do: {:num, n1-n2}
     def simplifyDataStructure_sub({:num, n1}, {:ratio, {:num, n2}, {:num, n3}}) do
       {:sub, {:num, n1}, {:ratio, {:num, n2}, {:num, n3}}}
@@ -188,7 +206,12 @@ defmodule Evaluation do
     end
     def simplifyDataStructure_sub({:num, n1}, {:add, {:num, n2}, {:ratio, {:num, n3}, {:num, n4}}}) do
       {:sub, {:num, n1-n2},{:ratio, {:num, n3}, {:num, n4}}}
+    end
 
+    def simplifyDataStructure_div(expr1, expr2) do
+      {:num, n1} = simplifyDataStructure(expr1)
+      {:num, n2} = simplifyDataStructure(expr2)
+      getRatioDataStructure(n1, n2)
     end
 
     def print({:num, n}), do: "#{n}"
