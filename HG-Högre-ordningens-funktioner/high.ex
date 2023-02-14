@@ -40,7 +40,6 @@ defmodule High do
     fold_left(t, f.(h, acc), f)
   end
 
-#TODO or maybe skip, better implementation to come
   def odd(list) do
     filter(list, (fn(x) -> rem(x,2) == 1 end))
   end
