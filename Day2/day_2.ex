@@ -1,8 +1,12 @@
 defmodule Day2 do
 
 
-  def run() do
-    calculateScore(getInput)
+  def runPartOne() do
+    calculateScore(getInput())
+  end
+
+  def runPartTwo() do
+    calculateScoreTwo(getInput())
   end
 
   def getInput() do
@@ -45,6 +49,32 @@ defmodule Day2 do
   def matchScore({"C", "X"}), do: 6+1
   def matchScore({"C", "Y"}), do: 0+2
   def matchScore({"C", "Z"}), do: 3+3
+
+
+  ## A = ROCK    = 1
+  ## B = PAPER   = 2
+  ## C = SCISSOR = 3
+  ## X =LOST = 0
+  ## Y =DRAW = 3
+  ## < =WIN = 6
+
+  def calculateScoreTwo([]), do: 0
+  def calculateScoreTwo([h|t]) do
+    matchScoreTwo(h) + calculateScoreTwo(t)
+  end
+
+  def matchScoreTwo({"A", "X"}), do: 0+3
+  def matchScoreTwo({"A", "Y"}), do: 3+1
+  def matchScoreTwo({"A", "Z"}), do: 6+2
+
+  def matchScoreTwo({"B", "X"}), do: 0+1
+  def matchScoreTwo({"B", "Y"}), do: 3+2
+  def matchScoreTwo({"B", "Z"}), do: 6+3
+
+  def matchScoreTwo({"C", "X"}), do: 0+2
+  def matchScoreTwo({"C", "Y"}), do: 3+3
+  def matchScoreTwo({"C", "Z"}), do: 6+1
+
 
 
 end
