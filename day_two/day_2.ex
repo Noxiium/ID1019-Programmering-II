@@ -14,7 +14,7 @@ defmodule Day2 do
     list = list |> String.split("\n")
     list = removeSpecialCharacter(list)
     |> Enum.map(&String.split(&1, " "))
-    |> Enum.map(&List.to_tuple/1)
+    #|> Enum.map(&List.to_tuple/1)
   end
 
   def removeSpecialCharacter(list) do
