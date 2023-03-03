@@ -15,7 +15,7 @@ defmodule ParseInput do
       {rate,_} = Integer.parse(rate)
       [_, _tunnels,_lead,_to,_valves| valves] = String.split(valves, [" "])
       valves = Enum.map(valves, fn(valve) -> String.to_atom(String.trim(valve,",")) end)
-      {valve, rate, valves}
+      {valve, {rate, valves}}
     end)
   end
 end
